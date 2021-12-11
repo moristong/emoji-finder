@@ -1,6 +1,6 @@
 var background = (function () {
   var tmp = {};
-  if (chrome.runtime && chrome.runtime.onMessage) {
+  if (chrome && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener(function (request) {
       for (var id in tmp) {
         if (tmp[id] && (typeof tmp[id] === "function")) {
@@ -243,18 +243,6 @@ var config  = {
             });
           }
           /*  */
-          find.addEventListener("click", function () {
-            config.app.fill(search.value);
-          });
-          /*  */
-          reload.addEventListener("click", function () {
-            document.location.reload();
-          });          
-          /*  */
-          search.addEventListener("input", function (e) {
-            config.app.fill(e.target.value);
-          });
-          /*  */
           select.addEventListener("change", function (e) {
             search.value = e.target.value;
             config.app.fill(search.value);
@@ -276,14 +264,11 @@ var config  = {
             toggle.setAttribute("title", state === "hide" ? "Show icon categories" : "Hide icon categories");
           });
           /*  */
-          if (config.port.name === "webapp") {
-            document.body.style.width = "calc(100% - 10px)";
-            document.querySelector("#detail").style.borderBottom = "0";
-            document.querySelector("#search").style.borderSpacing = "5px 0";
-          } else {
-            support.addEventListener("click", function () {background.send("support")});
-            donation.addEventListener("click", function () {background.send("donation")});
-          }
+          reload.addEventListener("click", function () {document.location.reload()});
+          find.addEventListener("click", function () {config.app.fill(search.value)});
+          support.addEventListener("click", function () {background.send("support")});
+          donation.addEventListener("click", function () {background.send("donation")});
+          search.addEventListener("input", function (e) {config.app.fill(e.target.value)});
           /*  */
           if (navigator.userAgent.indexOf("Edg") !== -1) document.getElementById("explore").style.display = "none";
           search.value = config.storage.read("emoji.keyword") !== undefined ? config.storage.read("emoji.keyword") : "smiley";

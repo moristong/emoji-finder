@@ -207,7 +207,7 @@ var config  = {
       }, 300);
     },
     "start": function () {
-      var path = chrome.runtime.getURL("data/interface/" + config.path);
+      var path = chrome.runtime.getURL("/data/interface/" + config.path);
       /*  */
       config.http.request(path, function (e) {
         if (e) {

@@ -12,7 +12,7 @@ Note 2: depending on your browser's version and operating systems, some emoji ic
 You can install this app as a PWA on your mobile device, moreover, it is available as a browser extension as-well-as a web application:
 
 Chrome: https://chrome.google.com/webstore/detail/emoji-finder/iccnjfgjkdodnhojijhmneglildgljde  
-Edge:   
+Edge: https://microsoftedge.microsoft.com/addons/detail/pogpfinjbkejdlojdhpknghkimlhfkco  
 Firefox: https://addons.mozilla.org/en-US/firefox/addon/easy-emoji/  
 Opera: https://addons.opera.com/en/extensions/details/easy-emoji/  
 Webapp & PWA: https://webbrowsertools.com/emoji-finder/  

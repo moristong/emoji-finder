@@ -1,9 +1,8 @@
 {
-  "version": "0.1.7",
+  "version": "0.1.8",
   "manifest_version": 3,
   "name": "Emoji Finder",
   "offline_enabled": true,
-  "short_name": "easy-emoji",
   "permissions": ["storage"],
   "homepage_url": "https://mybrowseraddon.com/easy-emoji.html",
   "description": "Easily find & copy any emoji(s) from your browser toolbar popup UI",

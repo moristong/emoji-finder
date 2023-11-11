@@ -1,20 +1,30 @@
 var background = (function () {
-  var tmp = {};
+  let tmp = {};
   if (chrome && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener(function (request) {
-      for (var id in tmp) {
+      for (let id in tmp) {
         if (tmp[id] && (typeof tmp[id] === "function")) {
           if (request.path === "background-to-popup") {
-            if (request.method === id) tmp[id](request.data);
+            if (request.method === id) {
+              tmp[id](request.data);
+            }
           }
         }
       }
     });
     /*  */
     return {
-      "receive": function (id, callback) {tmp[id] = callback},
+      "receive": function (id, callback) {
+        tmp[id] = callback;
+      },
       "send": function (id, data) {
-        chrome.runtime.sendMessage({"path": "popup-to-background", "method": id, "data": data});
+        chrome.runtime.sendMessage({
+          "method": id, 
+          "data": data,
+          "path": "popup-to-background"
+        }, function () {
+          return chrome.runtime.lastError;
+        });
       }
     }
   } else {
@@ -35,14 +45,14 @@ var config  = {
   "copy": function (e) {
     e.preventDefault();
     /*  */
-    var tmp = document.getElementById("emoji-icon").value;
+    const tmp = document.getElementById("emoji-icon").value;
     if (tmp) {
       e.clipboardData.setData("text/plain", tmp);
     }
   },
   "http": {
     "request": function (url, callback) {
-      var xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.onload = function () {callback(xhr.response)};
       xhr.open("GET", url, true);
       xhr.responseType = "json";
@@ -53,7 +63,7 @@ var config  = {
     "option": {
       "to": {
         "select": function (txt, val, select) {
-          var option = document.createElement("option");
+          const option = document.createElement("option");
           option.setAttribute("value", val);
           option.textContent = txt;
           select.appendChild(option);
@@ -65,7 +75,7 @@ var config  = {
     "name": '',
     "connect": function () {
       config.port.name = "webapp";
-      var context = document.documentElement.getAttribute("context");
+      const context = document.documentElement.getAttribute("context");
       /*  */
       if (chrome.runtime) {
         if (chrome.runtime.connect) {
@@ -98,7 +108,7 @@ var config  = {
     "write": function (id, data) {
       if (id) {
         if (data !== '' && data !== null && data !== undefined) {
-          var tmp = {};
+          let tmp = {};
           tmp[id] = data;
           config.storage.local[id] = data;
           chrome.storage.local.set(tmp, function () {});
@@ -111,23 +121,23 @@ var config  = {
   },
   "app": {
     "fill": function (keyword) {
-      var arr = [];
-      var tmp = [];
+      let arr = [];
+      let tmp = [];
       /*  */
       keyword = keyword ? keyword.toLowerCase() : '';
       config.storage.write("emoji.keyword", keyword);
       /*  */
-      var find = document.getElementById("find");
-      var table = document.getElementById("emoji");
-      var select = document.getElementById("emoji-select");
+      const find = document.getElementById("find");
+      const table = document.getElementById("emoji");
+      const select = document.getElementById("emoji-select");
       /*  */
       if (keyword && keyword !== "all emojis") {
         if (config.emoji.base[keyword]) {
           select.value = keyword;
           arr = config.emoji.base[keyword];
         } else {
-          for (var key in config.emoji.name) {
-            var name = config.emoji.name[key].toLowerCase();
+          for (let key in config.emoji.name) {
+            let name = config.emoji.name[key].toLowerCase();
             if (name.indexOf(keyword) !== -1) {
               tmp.push(key);
             }
@@ -146,13 +156,13 @@ var config  = {
       /*  */
       window.setTimeout(function () {
         if (arr.length) {
-          var count = 0;
+          let count = 0;
           while (count < arr.length) {
-            var tr = document.createElement("tr");
-            for (var i = 0; i < 10; i++) {
+            const tr = document.createElement("tr");
+            for (let i = 0; i < 10; i++) {
               if (count < arr.length) {
-                var td = document.createElement("td");
-                var str = arr[count].split(',');
+                const td = document.createElement("td");
+                const str = arr[count].split(',');
                 /*  */
                 td.setAttribute("code", arr[count]);
                 td.setAttribute("name", config.emoji.name[arr[count]] ? config.emoji.name[arr[count]].toLowerCase() : "N/A");
@@ -165,13 +175,12 @@ var config  = {
                   case 5: try {td.textContent = String.fromCodePoint(str[0], str[1], str[2], str[3], str[4])} catch (e) {}; break;
                 }
                 /*  */
-                td.addEventListener("click", function (e) {
-                  var code = e.target.getAttribute("code");
-                  var name = e.target.getAttribute("name");
-                  /*  */
-                  var icon = document.getElementById("emoji-icon");
-                  var detail = document.getElementById("emoji-detail");
-                  var search = document.getElementById("emoji-search");
+                td.addEventListener("click", async function (e) {
+                  const code = e.target.getAttribute("code");
+                  const name = e.target.getAttribute("name");
+                  const icon = document.getElementById("emoji-icon");
+                  const detail = document.getElementById("emoji-detail");
+                  const search = document.getElementById("emoji-search");
                   /*  */
                   icon.value = e.target.textContent;
                   if (e.isTrusted) search.value = name;
@@ -179,7 +188,10 @@ var config  = {
                   detail.title = "The emoji is copied to the clipboard!";
                   /*  */
                   config.storage.write("emoji.code", code);
-                  document.execCommand("copy");
+                  const result = await navigator.permissions.query({"name": "clipboard-write"});
+                  if (e.isTrusted && result.state === "granted") {
+                    navigator.clipboard.writeText(code);
+                  }
                 });
                 /*  */
                 tr.appendChild(td);
@@ -191,10 +203,10 @@ var config  = {
           }
           /*  */
           window.setTimeout(function () {
-            var emoji = document.getElementById("emoji");
-            var selector = "td[code='" + config.emoji.selected + "']";
+            const emoji = document.getElementById("emoji");
+            const selector = "td[code='" + config.emoji.selected + "']";
             /*  */
-            var target = document.querySelector(selector);
+            const target = document.querySelector(selector);
             if (target) {
               target.click();
             } else {
@@ -207,24 +219,24 @@ var config  = {
       }, 300);
     },
     "start": function () {
-      var path = chrome.runtime.getURL("/data/interface/" + config.path);
+      const path = chrome.runtime.getURL("/data/interface/" + config.path);
       /*  */
       config.http.request(path, function (e) {
         if (e) {
           config.emoji = e;
           /*  */
-          var all = document.getElementById("all");
-          var find = document.getElementById("find");
-          var select = document.createElement("select");
-          var toggle = document.getElementById("toggle");
-          var reload = document.getElementById("reload");
-          var support = document.getElementById("support");
-          var category = document.getElementById("category");
-          var donation = document.getElementById("donation");
-          var buttons = [...category.querySelectorAll("td")];
-          var container = document.querySelector(".container");
-          var search = document.getElementById("emoji-search");
-          var state = config.storage.read("emoji.toggle") !== undefined ? config.storage.read("emoji.toggle") : "hide";
+          const all = document.getElementById("all");
+          const find = document.getElementById("find");
+          const select = document.createElement("select");
+          const toggle = document.getElementById("toggle");
+          const reload = document.getElementById("reload");
+          const support = document.getElementById("support");
+          const category = document.getElementById("category");
+          const donation = document.getElementById("donation");
+          const buttons = [...category.querySelectorAll("td")];
+          const container = document.querySelector(".container");
+          const search = document.getElementById("emoji-search");
+          const state = config.storage.read("emoji.toggle") !== undefined ? config.storage.read("emoji.toggle") : "hide";
           /*  */
           toggle.setAttribute("state", state);
           category.setAttribute("state", state);
@@ -234,10 +246,10 @@ var config  = {
           /*  */
           config.add.option.to.select("Select", '', select);
           config.add.option.to.select("All", "all emojis", select);
-          for (var id in config.emoji.base) config.add.option.to.select(id, id, select);
+          for (let id in config.emoji.base) config.add.option.to.select(id, id, select);
           all.appendChild(select);
           /*  */
-          for (var i = 0; i < buttons.length; i++) {
+          for (let i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener("click", function (e) {
               config.app.fill(e.target.getAttribute("id"));
             });
@@ -249,13 +261,13 @@ var config  = {
           });
           /*  */
           search.addEventListener("keypress", function (e) {
-            if ((e.which || e.keyCode) === 13) {
+            if (e.code === 13) {
               config.app.fill(e.target.value);
             }
           });
           /*  */
           toggle.addEventListener("click", function () {
-            var state = toggle.getAttribute("state") === "hide" ? "show" : "hide";
+            const state = toggle.getAttribute("state") === "hide" ? "show" : "hide";
             /*  */
             toggle.setAttribute("state", state);
             category.setAttribute("state", state);

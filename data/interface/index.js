@@ -176,17 +176,21 @@ var config  = {
                 }
                 /*  */
                 td.addEventListener("click", async function (e) {
+                  const table = e.target.closest("table");
                   const code = e.target.getAttribute("code");
                   const name = e.target.getAttribute("name");
                   const icon = document.getElementById("emoji-icon");
                   const detail = document.getElementById("emoji-detail");
                   const search = document.getElementById("emoji-search");
+                  const selected = [...table.querySelectorAll("td[selected]")];
                   /*  */
                   icon.value = e.target.textContent;
                   if (e.isTrusted) search.value = name;
                   detail.value = " Hex: " + code + " Name: " + name;
+                  selected.map(td => td.removeAttribute("selected"));
                   detail.title = "The emoji is copied to the clipboard!";
                   /*  */
+                  e.target.setAttribute("selected", '');
                   config.storage.write("emoji.code", code);
                   const result = await navigator.permissions.query({"name": "clipboard-write"});
                   if (e.isTrusted && result.state === "granted") {
@@ -209,6 +213,11 @@ var config  = {
             const target = document.querySelector(selector);
             if (target) {
               target.click();
+              target.scrollIntoView({
+                "block": "center", 
+                "inline": "center",
+                "behavior": "smooth"
+              });
             } else {
               emoji.querySelector("td").click();
             }

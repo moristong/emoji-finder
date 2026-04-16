@@ -236,6 +236,7 @@ var config  = {
           /*  */
           const all = document.getElementById("all");
           const find = document.getElementById("find");
+          const theme = document.getElementById("theme");
           const select = document.createElement("select");
           const toggle = document.getElementById("toggle");
           const reload = document.getElementById("reload");
@@ -275,6 +276,14 @@ var config  = {
             }
           });
           /*  */
+          theme.addEventListener("click", function () {
+            let attribute = document.documentElement.getAttribute("theme");
+            attribute = attribute === "dark" ? "light" : "dark";
+            /*  */
+            document.documentElement.setAttribute("theme", attribute);
+            config.storage.write("emoji.theme", attribute);
+          });
+          /*  */
           toggle.addEventListener("click", function () {
             const state = toggle.getAttribute("state") === "hide" ? "show" : "hide";
             /*  */
@@ -294,6 +303,7 @@ var config  = {
           if (navigator.userAgent.indexOf("Edg") !== -1) document.getElementById("explore").style.display = "none";
           search.value = config.storage.read("emoji.keyword") !== undefined ? config.storage.read("emoji.keyword") : "smiley";
           config.emoji.selected = config.storage.read("emoji.code") !== undefined ? config.storage.read("emoji.code") : "0x1f600";
+          document.documentElement.setAttribute("theme", config.storage.read("emoji.theme") !== undefined ? config.storage.read("emoji.theme") : "light");
           /*  */
           config.app.fill(search.value);
         }
